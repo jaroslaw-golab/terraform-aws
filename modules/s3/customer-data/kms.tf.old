@@ -1,0 +1,4 @@
+resource "aws_kms_key" "customer_key" {
+  description = "This key is used to encrypt customer submission bucket"
+
+}

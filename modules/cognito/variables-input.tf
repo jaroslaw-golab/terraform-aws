@@ -1,0 +1,9 @@
+#variable "pool_prod" {}
+#variable "pool_dev" {}
+variable "pool_sb" {}
+#variable "pool_test" {}
+variable "pool_training" {}
+variable "sns_topic_name" {}
+variable "sns_caller_arn" {}
+variable "sns_external_id" {}
+variable "app-client-config-name" {}

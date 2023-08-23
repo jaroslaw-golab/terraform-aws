@@ -1,0 +1,28 @@
+#cloud-config
+# Add groups to the system
+# Adds the ubuntu group with members 'root' and 'sys'
+# and the empty group hashicorp.
+# groups:
+#   - ubuntu: [root,sys]
+#   - devops
+
+# Add users to the system. Users are added after groups are added.
+# users:
+#   - name: ansible
+#     shell: /bin/bash
+#     groups: sudo
+#     lock_passwd: false
+#     ssh_authorized_keys:
+#       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC4sh+ARz+IvJlHqol15oB+UzFCes6SMyUMyCmMLeZZcXdZrrICC3jpVjPzI99/KMKdstv4A6PlFgRY7sQqGaL1udjPearAVJOT0vRr5gs748k0e6QDBWJlpE03c0YH+biuIyTxjxhjLLz7CvBl7JGyQmQKbn8XhHZOQBqkpoZVBHViJUlLTNTe9y0ObkYjE8rHShAh+WTzI9mtMtafzjyMA6fUirTvx76l3wxX/lEbGXivcqsunkjpKE8zu6MG4rpjl/jCQLlnq5BH/Xl5CJ5bI/64usZzQBIgNCKT2Wb1mSVNyvp7MewfF7VDb8QC1Vf92usaa63okA7hbEBS3kL9OIcCBI0A8IMOMbYRDZNtmiiCZU3pzKFmsq3A2eMjBPO26ouslU5OQDT6i/SrrLnQCgAPpDRurrnniskGxohCv+B56DyTD+vMe1tPLBhlBSIO6Oj3YmfplAZKSbCjDAz7UlAgmqLnAVtWmLTBX1y4EjCmyeRMIoE3XYlmKAygtqsLoEtsC43fJlQMXU4ZNVYEJvW2sQFkL0sU3BC0xAnIvNZxbRfCNQkora9KBnNcjXVqy/zBvHviZ0vNXnSTpKyj+gggglXvnaLySCIOXEQACbYChZ/AsCDXGJ+29aBJOAH7UQOksdwfXjVqd+fCJMgM7GdZKx2Fju8hwtyxoODemQ== ernest@DESKTOP-21K8L3U
+
+# Downloads the golang package
+packages:
+  - ansible
+
+# Sets the GOPATH & downloads the demo payload
+ runcmd:
+   - export OAUTH_TOKEN=ATBBkc4WfEJeb3BHKBYmgzgUyW9s380B5393
+#   - sudo mkdir /home/terraform/go
+#   - sudo chown terraform:hashicorp /home/terraform/go
+#   - export GOPATH=/home/terraform/go
+#   - go get github.com/hashicorp/learn-go-webapp-demo

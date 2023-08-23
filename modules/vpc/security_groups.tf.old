@@ -1,0 +1,195 @@
+resource "aws_security_group" "BatchSecurityGroup" {
+  name   = "batch-sg"
+  vpc_id = aws_vpc.prod-vpc.id
+
+  egress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "all"
+  }
+
+  ingress {
+    from_port = 22
+    to_port   = 22
+    cidr_blocks = [
+      "${var.aws_vpn}"
+    ]
+    protocol    = "tcp"
+    description = "aws_vpn"
+  }
+
+  tags = {
+    "Name" = "batch-sg"
+  }
+
+}
+
+resource "aws_security_group" "AlbSecurityGroup" {
+  name   = "verify-loadbalancer-sg"
+  vpc_id = aws_vpc.prod-vpc.id
+
+  egress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "all"
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    cidr_blocks = [
+      "${var.aws_vpn}"
+    ]
+    protocol    = "tcp"
+    description = "aws_vpn"
+
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    cidr_blocks = [
+      "3.227.45.172/32"
+    ]
+    protocol    = "tcp"
+    description = "nat-gateway"
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    cidr_blocks = [
+      "147.235.27.218/32"
+    ]
+    protocol    = "tcp"
+    description = "beaconcure-office"
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    cidr_blocks = [
+      "85.89.185.156/32"
+    ]
+    protocol    = "tcp"
+    description = "jarek-office"
+
+
+  }
+
+
+
+  tags = {
+    "Name" = "alb-sg"
+  }
+}
+
+resource "aws_security_group" "application-security-group" {
+  name   = "application-sg"
+  vpc_id = aws_vpc.prod-vpc.id
+  egress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "all"
+  }
+
+  ingress {
+    from_port = 22
+    to_port   = 22
+    cidr_blocks = [
+      "${var.aws_vpn}"
+    ]
+    protocol    = "tcp"
+    description = "aws_vpn"
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    security_groups = [
+      "${aws_security_group.AlbSecurityGroup.id}"
+    ]
+
+    protocol    = "tcp"
+    description = "verify-load-balancer"
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    security_groups = [
+      "${aws_security_group.BatchSecurityGroup.id}"
+    ]
+    protocol    = "tcp"
+    description = "BatchSecurityGroup"
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    cidr_blocks = [
+      "172.16.1.24/32"
+    ]
+    protocol    = "tcp"
+    description = "build.beaconcure.com"
+  }
+  tags = {
+    "Name" = "application-sg"
+  }
+
+
+}
+
+resource "aws_security_group" "database-security-group" {
+  name   = "database-sg"
+  vpc_id = aws_vpc.prod-vpc.id
+  egress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "all"
+  }
+
+  ingress {
+    from_port = var.DatabasePort
+    to_port   = var.DatabasePort
+    security_groups = [
+      "${aws_security_group.application-security-group.id}"
+    ]
+    protocol    = "tcp"
+    description = "application"
+  }
+
+  ingress {
+    from_port = var.MongoDbPort
+    to_port   = var.MongoDbPort
+    security_groups = [
+      "${aws_security_group.application-security-group.id}"
+    ]
+    protocol    = "tcp"
+    description = "application"
+  }
+}
+
+resource "aws_security_group" "processing-security-group" {
+  name   = "processing-sg"
+  vpc_id = aws_vpc.prod-vpc.id
+  egress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "all"
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    cidr_blocks = [var.aws_vpn]
+    protocol    = "tcp"
+    description = "aws-vpn"
+  }
+}
+

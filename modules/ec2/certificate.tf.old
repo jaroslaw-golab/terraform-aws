@@ -1,0 +1,29 @@
+resource "aws_acm_certificate" "pf-cert" {
+  domain_name = "verify-pf.beaconcure.com"
+  key_algorithm = "RSA_2048"
+  subject_alternative_names = [
+    "verify-pf-dev.beaconcure.com",
+    "verify-pf-sb.beaconcure.com",
+    "verify-pf-test.beaconcure.com",
+    "verify-pf-training.beaconcure.com",
+    "verify-pf.beaconcure.com"]
+  validation_method = "DNS"
+  options {
+    certificate_transparency_logging_preference = "ENABLED"
+  }
+}
+
+locals {
+   certs_records = zipmap(aws_acm_certificate.pf-cert.domain_validation_options.*.resource_record_name, aws_acm_certificate.pf-cert.domain_validation_options.*.resource_record_value)
+}
+
+resource "aws_route53_record" "pf-records" {
+  provider = aws.vpc2
+  for_each = local.certs_records
+  allow_overwrite = true
+  name = each.key
+  records = [each.value]
+  type = "CNAME"
+  zone_id = "Z05718442SC520EDRJWF1"
+  ttl = 1799
+}
